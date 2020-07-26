@@ -1,0 +1,27 @@
+.HamburgerIcon {
+    display: block;
+    width: 50px;
+    border: 1px solid white;
+    border-radius: 4px;
+    margin: 0;
+    padding: 10px;
+    background: transparent;
+    cursor: pointer;
+
+    &:hover,
+    &:active {
+        background-color: #8F5C2C;
+    }
+}
+
+.Bar {
+    width: 100%;
+    height: 3px;
+    margin-top: 5px;
+    background-color: white;
+    border-radius: 1px;
+
+    &:first-child {
+        margin-top: 0;
+    }
+}
