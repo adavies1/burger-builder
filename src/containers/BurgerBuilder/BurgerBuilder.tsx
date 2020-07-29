@@ -14,6 +14,7 @@ import {
     BURGER_INGREDIENT_COUNT
 } from '../../constants';
 import { transformObject } from '../../utils';
+import withErrorHander from '../../hoc/withErrorHandler/withErrorHandler';
 
 type BurgerBuilderProps = {
 
@@ -143,4 +144,4 @@ class BurgerBuilder extends Component<BurgerBuilderProps, BurgerBuilderState> {
     }
 };
 
-export default BurgerBuilder;
+export default withErrorHander(BurgerBuilder, axios);
