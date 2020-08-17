@@ -1,53 +1,59 @@
-import React, { useState, FunctionComponent, useEffect } from 'react';
+import React, { Component } from 'react';
 import { AxiosInstance, AxiosError } from 'axios';
 import Modal from '../../components/UI/Modal/Modal';
 
-type withErrorHanderState = {
+type WithErrorHandlerState = {
     error: AxiosError | undefined
 }
 
-let reqInterceptor: number;
-let respInterceptor: number;
+type WithErrorHandlerProps = {
 
-const withErrorHander = <P extends object>(WrappedComponent: React.ComponentType<P>, axios: AxiosInstance): FunctionComponent<P> => {
-    return (props) => {
-        const [state, updateState] = useState<withErrorHanderState>({
+}
+
+const withErrorHandler = (WrappedComponent: React.ComponentType, axios: AxiosInstance) => {
+    return class WithErrorHandler extends Component<WithErrorHandlerProps, WithErrorHandlerState> {
+        reqInterceptorId: number | undefined = undefined;
+        respInterceptorId: number | undefined = undefined;
+
+        state:WithErrorHandlerState = {
             error: undefined
-        });
+        }
 
-        // Mount
-        useEffect(() => {
-            reqInterceptor = axios.interceptors.request.use(req => {
-                updateState({ error: undefined });
+        constructor(props: WithErrorHandlerProps) {
+            super(props);
+
+            this.reqInterceptorId = axios.interceptors.request.use(req => {
+                this.setState({ error: undefined });
                 return req;
             });
-            respInterceptor = axios.interceptors.response.use(undefined, resp => {
-                updateState({ error: resp });
-                return resp;
+            this.respInterceptorId = axios.interceptors.response.use(undefined, error => {
+                this.setState({ error: error });
+                return Promise.reject(error);
             });
-        }, []);
+        }
 
-        // Unmount
-        useEffect(() => () => {
-            axios.interceptors.request.eject(reqInterceptor);
-            axios.interceptors.response.eject(respInterceptor);
-        }, []);
+        componentWillUnmount() {
+            axios.interceptors.request.eject(this.reqInterceptorId as number);
+            axios.interceptors.response.eject(this.respInterceptorId as number);
+        }
 
-        const closeModalHandler = () => {
-            updateState({
+        closeModalHandler = () => {
+            this.setState({
                 error: undefined
             });
         }
 
-        return (
-            <>
-                <Modal show={!!state.error} close={closeModalHandler}>
-                    {state.error ? state.error.message : null}
-                </Modal>
-                <WrappedComponent {...props}/>
-            </>
-        );
+        render() {
+            return (
+                <>
+                    <Modal show={!!this.state.error} close={this.closeModalHandler}>
+                        {this.state.error ? this.state.error.message : null}
+                    </Modal>
+                    <WrappedComponent {...this.props}/>
+                </>
+            )
+        };
     }
 }
 
-export default withErrorHander;
+export default withErrorHandler;

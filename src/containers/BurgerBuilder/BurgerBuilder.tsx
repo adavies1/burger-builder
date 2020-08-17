@@ -21,8 +21,10 @@ type BurgerBuilderProps = {
 };
 
 type BurgerBuilderState = {
+    error: boolean,
     ingredients: BURGER_INGREDIENT_COUNT,
     loading: boolean,
+    loadingIngredients: boolean,
     price: number,
     purchasable: boolean,
     purchasing: boolean
@@ -30,46 +32,81 @@ type BurgerBuilderState = {
 
 class BurgerBuilder extends Component<BurgerBuilderProps, BurgerBuilderState> {
     state:BurgerBuilderState = {
-        ingredients: {
-            salad: 0,
-            bacon: 0,
-            cheese: 0,
-            meat: 0
-        },
+        error: false,
+        ingredients: {} as BURGER_INGREDIENT_COUNT,
         loading: false,
+        loadingIngredients: false,
         price: BURGER_BASE_PRICE,
         purchasable: false,
         purchasing: false
     }
 
+    constructor(props: BurgerBuilderProps) {
+        super(props);
+
+        console.log('burger start');
+    }
+
+    componentDidMount() {
+        this.setState({
+            loadingIngredients: true
+        });
+
+        axios.get<BURGER_INGREDIENT_COUNT>('/ingredients.json')
+            .then(resp => {
+                this.setState({
+                    ingredients: resp.data,
+                    loadingIngredients: false
+                })
+            })
+            .catch(err => {
+                console.error('Failed to load ingredients list');
+                this.setState({
+                    error: true
+                })
+            })
+    }
+
     render() {
         return (
             <>
-                <Modal show={this.state.purchasing} close={this.purchaseCancelHandler}>
-                    {this.state.loading
-                        ? <Spinner />
-                        : <OrderSummary
-                            ingredients={this.state.ingredients}
-                            price={this.state.price}
-                            cancelPurchase={this.purchaseCancelHandler}
-                            confirmPurchase={this.purchaseConfirmHandler}/>
-                    }
-                </Modal>
-                <Burger ingredients={this.state.ingredients}/>
-                <BuildControls
-                    price={this.state.price}
-                    purchasable={this.state.purchasable}
-                    disabledIngredients={transformObject(this.state.ingredients, i => i <= 0)}
-                    ingredientAdded={this.addIngredientHandler}
-                    ingredientRemoved={this.removeIngredientHandler}
-                    purchase={this.purchaseHandler} />
+                {this.state.error
+                    ? <p style={{textAlign: 'center'}}>Sorry folks, we're having problems. No burgers today =(</p>
+                    : <>
+                        <Modal show={this.state.purchasing} close={this.purchaseCancelHandler}>
+                            {this.state.loading || this.state.loadingIngredients
+                                ? <Spinner />
+                                : <OrderSummary
+                                    ingredients={this.state.ingredients}
+                                    price={this.state.price}
+                                    cancelPurchase={this.purchaseCancelHandler}
+                                    confirmPurchase={this.purchaseConfirmHandler}/>
+                            }
+                        </Modal>
+                        {this.state.loadingIngredients
+                            ? <Spinner/>
+                            : <>
+                                <Burger ingredients={this.state.ingredients}/>
+                                <BuildControls
+                                    price={this.state.price}
+                                    purchasable={this.state.purchasable}
+                                    disabledIngredients={transformObject(this.state.ingredients, i => i <= 0)}
+                                    ingredientAdded={this.addIngredientHandler}
+                                    ingredientRemoved={this.removeIngredientHandler}
+                                    purchase={this.purchaseHandler} />
+                            </>
+                        }
+                    </>
+                }
             </>
         );
     }
 
     addIngredientHandler = (type:BURGER_INGREDIENT_IDS) => {
-        const newIngredients:BURGER_INGREDIENT_COUNT = {...this.state.ingredients};
-        newIngredients[type] = this.state.ingredients[type] + 1;
+        const newIngredients:BURGER_INGREDIENT_COUNT = {
+            ...this.state.ingredients,
+            [type]: this.state.ingredients[type] + 1
+        };
 
         this.setState({
             ingredients: newIngredients,
@@ -120,8 +157,10 @@ class BurgerBuilder extends Component<BurgerBuilderProps, BurgerBuilderState> {
     }
 
     removeIngredientHandler = (type:BURGER_INGREDIENT_IDS) => {
-        const newIngredients:BURGER_INGREDIENT_COUNT = {...this.state.ingredients};
-        newIngredients[type] = Math.max(0, this.state.ingredients[type] - 1);
+        const newIngredients:BURGER_INGREDIENT_COUNT = {
+            ...this.state.ingredients,
+            [type]: Math.max(0, this.state.ingredients[type] - 1)
+        };
 
         this.setState({
             ingredients: newIngredients,
