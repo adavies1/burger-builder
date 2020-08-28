@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { RouteComponentProps } from 'react-router-dom'
 
 import Burger from '../../components/Burger/Burger';
 import BuildControls from '../../components/Burger/BuildControls/BuildControls';
@@ -13,17 +14,20 @@ import {
     BURGER_BASE_PRICE,
     BURGER_INGREDIENT_COUNT
 } from '../../constants';
-import { transformObject } from '../../utils';
+import { transformObject, UrlEncodeObj } from '../../utils';
 import withErrorHander from '../../hoc/withErrorHandler/withErrorHandler';
 
-type BurgerBuilderProps = {
+type BurgerBuilderRouteParams = {
+
+}
+
+interface BurgerBuilderProps extends RouteComponentProps<BurgerBuilderRouteParams> {
 
 };
 
 type BurgerBuilderState = {
     error: boolean,
     ingredients: BURGER_INGREDIENT_COUNT,
-    loading: boolean,
     loadingIngredients: boolean,
     price: number,
     purchasable: boolean,
@@ -34,7 +38,6 @@ class BurgerBuilder extends Component<BurgerBuilderProps, BurgerBuilderState> {
     state:BurgerBuilderState = {
         error: false,
         ingredients: {} as BURGER_INGREDIENT_COUNT,
-        loading: false,
         loadingIngredients: false,
         price: BURGER_BASE_PRICE,
         purchasable: false,
@@ -74,7 +77,7 @@ class BurgerBuilder extends Component<BurgerBuilderProps, BurgerBuilderState> {
                     ? <p style={{textAlign: 'center'}}>Sorry folks, we're having problems. No burgers today =(</p>
                     : <>
                         <Modal show={this.state.purchasing} close={this.purchaseCancelHandler}>
-                            {this.state.loading || this.state.loadingIngredients
+                            {this.state.loadingIngredients
                                 ? <Spinner />
                                 : <OrderSummary
                                     ingredients={this.state.ingredients}
@@ -122,32 +125,13 @@ class BurgerBuilder extends Component<BurgerBuilderProps, BurgerBuilderState> {
     }
 
     purchaseConfirmHandler = () => {
-        this.setState({
-            loading: true
-        }, () => {
-            axios.post('/orders.json', {
-                ingredients: this.state.ingredients,
-                price: this.state.price,
-                customer: {
-                    name: 'Alex',
-                    address: {
-                        street: "Test street",
-                        postcode: "TE1 1ST",
-                        country: "UK"
-                    },
-                    email: "test@test.com",
-                },
-                deliveryMethod: "fastest"
+        this.props.history.push({
+            pathname: '/checkout',
+            search: UrlEncodeObj({
+                ...this.state.ingredients,
+                price: this.state.price
             })
-            .then(resp => console.log(resp))
-            .catch(err => console.error(err))
-            .finally(() => {
-                this.setState({
-                    loading: false,
-                    purchasing: false
-                });
-            })
-        });
+        })
     }
 
     purchaseHandler = () => {

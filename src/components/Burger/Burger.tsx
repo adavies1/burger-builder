@@ -5,6 +5,7 @@ import css from './Burger.module.scss';
 
 type BurgerProps = {
     ingredients: BURGER_INGREDIENT_COUNT
+    orderMode?: boolean
 }
 
 const burger:FunctionComponent<BurgerProps> = props => {
@@ -16,7 +17,7 @@ const burger:FunctionComponent<BurgerProps> = props => {
 
 
     return (
-        <div className={css.Burger}>
+        <div className={`${css.Burger} ${props.orderMode ? css.OrderMode : ''}`}>
             <BurgerIngredient type="bread-top" />
             {burgerIngredients.length > 0
                 ? burgerIngredients

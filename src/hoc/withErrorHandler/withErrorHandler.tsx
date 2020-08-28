@@ -10,7 +10,7 @@ type WithErrorHandlerProps = {
 
 }
 
-const withErrorHandler = (WrappedComponent: React.ComponentType, axios: AxiosInstance) => {
+const withErrorHandler = (WrappedComponent: React.ComponentType<any>, axios: AxiosInstance) => {
     return class WithErrorHandler extends Component<WithErrorHandlerProps, WithErrorHandlerState> {
         reqInterceptorId: number | undefined = undefined;
         respInterceptorId: number | undefined = undefined;

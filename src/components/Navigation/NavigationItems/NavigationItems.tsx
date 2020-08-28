@@ -9,7 +9,7 @@ type NavigationItemsProps = {
 const navigationItems:FunctionComponent<NavigationItemsProps> = () => (
     <ul className={css.NavigationItems}>
         <NavigationItem href={'/'} active>Burger Builder</NavigationItem>
-        <NavigationItem href={'/'}>Checkout</NavigationItem>
+        <NavigationItem href={'/orders'}>Orders</NavigationItem>
     </ul>
 )
 

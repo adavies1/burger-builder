@@ -4,6 +4,24 @@ export type BURGER_INGREDIENT_LABEL = Record<BURGER_INGREDIENT_IDS, string>;
 export type BURGER_INGREDIENT_COUNT = Record<BURGER_INGREDIENT_IDS, number>;
 export type BURGER_INGREDIENT_FLAG = Record<BURGER_INGREDIENT_IDS, boolean>;
 
+export type CUSTOMER_DETAILS = {
+    address: {
+        country: string,
+        postcode: string,
+        street: string
+    },
+    email: string,
+    name: string
+}
+
+export type ORDER = {
+    customer: CUSTOMER_DETAILS,
+    deliveryMethod: string,
+    ingredients: BURGER_INGREDIENT_COUNT,
+    price: number
+};
+
+
 export const BURGER_INGREDIENTS:BURGER_INGREDIENT_LABEL = {
     meat: 'Meat',
     cheese: 'Cheese',

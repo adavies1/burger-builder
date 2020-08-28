@@ -1,5 +1,6 @@
 import React, { FunctionComponent } from 'react';
 import css from './NavigationItem.module.scss';
+import { NavLink } from 'react-router-dom';
 
 export type NavigationItemProps = {
     href: string,
@@ -8,9 +9,9 @@ export type NavigationItemProps = {
 
 const navigationItem:FunctionComponent<NavigationItemProps> = props => (
     <li className={css.NavigationItem}>
-        <a className={`${css.link} ${props.active ? css.active : ''}`} href={props.href}>
+        <NavLink exact className={`${css.link}`} to={props.href} activeClassName={css.active}>
             {props.children}
-        </a>
+        </NavLink>
     </li>
 )
 

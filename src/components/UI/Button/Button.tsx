@@ -3,11 +3,11 @@ import css from './Button.module.scss'
 
 type ButtonProps = {
     clicked: () => void,
-    type: string
+    type: 'Success' | 'Danger'
 };
 
 const Button:FunctionComponent<ButtonProps> = props => (
-    <button className={[css.Button, css[props.type]].join(' ')} onClick={props.clicked}>
+    <button type="button" className={[css.Button, css[props.type]].join(' ')} onClick={props.clicked}>
         {props.children}
     </button>
 );
