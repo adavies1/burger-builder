@@ -12,7 +12,7 @@ type appState = {
 
 function App() {
   return (
-    <BrowserRouter>
+    <BrowserRouter basename="burger-builder">
       <Layout>
         <Switch>
           <Route path="/checkout" component={Checkout}/>
